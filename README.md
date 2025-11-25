@@ -20,6 +20,28 @@
 
 โปรเจกต์นี้มาพร้อมกับการตั้งค่า VS Code ที่ช่วยให้การจัดรูปแบบโค้ดอัตโนมัติสำหรับ **HTML**, **CSS** และ **JavaScript** ทำให้โค้ดอ่านง่ายและสม่ำเสมอมากขึ้น โดยจะทำการ format อัตโนมัติเมื่อบันทึกไฟล์
 
+### 4. Dynamic CDN Loader
+
+ฟังก์ชัน `loadCDN()` ช่วยให้สามารถโหลด CDN resources (CSS หรือ JavaScript) แบบ dynamic ได้อย่างง่ายดาย โดยจะตรวจสอบว่า resource นั้นถูกโหลดไปแล้วหรือยัง เพื่อป้องกันการโหลดซ้ำ และรองรับ Promise สำหรับการจัดการ asynchronous operations
+
+**คุณสมบัติ:**
+- โหลด CSS และ JavaScript จาก CDN แบบ dynamic
+- ตรวจสอบและป้องกันการโหลดซ้ำ
+- รองรับ Promise สำหรับ async/await
+- Error handling ที่ชัดเจน
+
+**ตัวอย่างการใช้งาน:**
+```javascript
+// โหลด CSS
+loadCDN('css', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css');
+
+// โหลด JavaScript
+loadCDN('js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js');
+
+// ใช้งานกับ async/await
+await loadCDN('css', 'https://cdn.example.com/style.css');
+```
+
 ---
 
 ## 📌 Prerequisites
@@ -57,11 +79,14 @@ NODE_ENV=localhost
 
 ```
 node1/
-├── public/          # ไฟล์ static (HTML, CSS, JS)
+├── public/              # ไฟล์ static (HTML, CSS, JS)
+│   ├── assets/
+│   │   └── js/
+│   │       └── script.js    # loadCDN function
 │   └── index.html
-├── index.js         # Entry point ของแอปพลิเคชัน
-├── package.json     # Dependencies และ scripts
-└── README.md        # เอกสารประกอบ
+├── index.js             # Entry point ของแอปพลิเคชัน
+├── package.json          # Dependencies และ scripts
+└── README.md             # เอกสารประกอบ
 ```
 
 ---
@@ -89,6 +114,40 @@ npm start
 ```bash
 pm2 start index.js --name my-app
 ```
+
+### ใช้ loadCDN Function
+
+ฟังก์ชัน `loadCDN()` ถูกโหลดอัตโนมัติเมื่อหน้าเว็บโหลด (ผ่าน `script.js`) สามารถเรียกใช้งานได้ทันที:
+
+```javascript
+// โหลด CSS จาก CDN
+loadCDN('css', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css')
+    .then(() => {
+        console.log('Bootstrap CSS loaded!');
+    })
+    .catch((error) => {
+        console.error('Failed to load CSS:', error);
+    });
+
+// โหลด JavaScript จาก CDN
+loadCDN('js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js')
+    .then(() => {
+        console.log('Bootstrap JS loaded!');
+    });
+
+// ใช้ async/await
+(async () => {
+    try {
+        await loadCDN('css', 'https://cdn.example.com/style.css');
+        await loadCDN('js', 'https://cdn.example.com/script.js');
+        console.log('All CDN resources loaded!');
+    } catch (error) {
+        console.error('Error loading CDN:', error);
+    }
+})();
+```
+
+> 💡 **เคล็ดลับ**: ฟังก์ชันจะตรวจสอบว่า resource ถูกโหลดไปแล้วหรือยัง หากโหลดแล้วจะไม่โหลดซ้ำ
 
 ---
 

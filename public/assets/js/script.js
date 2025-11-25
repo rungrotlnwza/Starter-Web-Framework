@@ -1,4 +1,3 @@
-
 function loadCDN(type, url) {
     return new Promise((resolve, reject) => {
         // ตรวจสอบว่าโหลดแล้วหรือยัง
@@ -40,5 +39,41 @@ function loadCDN(type, url) {
         }
     });
 }
+
 loadCDN('css', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css')
 loadCDN('js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js')
+
+async function loadComponent(id, filename) {
+    const el = document.getElementById(id);
+    if (!el) {
+        console.log(`Element with id '${id}' not found`);
+        return;
+    }
+    try {
+        const res = await fetch(`/assets/components/${filename}`);
+        const html = await res.text();
+        el.innerHTML = html;
+        // ...existing code...
+    } catch (err) {
+        console.error(`Failed to load component '${filename}':`, err);
+    }
+}
+
+loadComponent('navbar', 'navbar.html').then(() => {
+    const token = false;
+    if (token) {
+        document.getElementById('dashboard').classList.remove('d-none');
+        document.getElementById('logout').classList.remove('d-none');
+        document.getElementById('login').classList.add('d-none');
+        document.getElementById('register').classList.add('d-none');
+    } else {
+        document.getElementById('login').classList.remove('d-none');
+        document.getElementById('register').classList.remove('d-none');
+        document.getElementById('dashboard').classList.add('d-none');
+        document.getElementById('logout').classList.add('d-none');
+    }
+}).catch((error) => {
+    console.error('Failed to load component:', error);
+});
+
+loadComponent('footer', 'footer.html')

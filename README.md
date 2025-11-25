@@ -42,6 +42,52 @@ loadCDN('js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bu
 await loadCDN('css', 'https://cdn.example.com/style.css');
 ```
 
+### 5. Dynamic Component Loader
+
+ฟังก์ชัน `loadComponent()` ช่วยให้สามารถโหลด HTML components แบบ dynamic ได้อย่างง่ายดาย โดยจะดึงไฟล์ HTML จาก server และ inject เข้าไปใน element ที่ระบุ ทำให้สามารถแยก components ออกเป็นไฟล์ต่างหากได้ และโหลดเข้ามาใช้เมื่อต้องการ
+
+**คุณสมบัติ:**
+- โหลด HTML components แบบ dynamic จาก server
+- รองรับ Promise สำหรับ async/await และ .then()
+- Error handling ที่ชัดเจน
+- ตรวจสอบว่า element ที่ระบุมีอยู่ใน DOM หรือไม่
+
+**ตัวอย่างการใช้งาน:**
+```javascript
+// โหลด component แบบ Promise
+loadComponent('navbar', 'navbar.html')
+    .then(() => {
+        console.log('Navbar loaded!');
+        // ทำงานต่อหลังจากโหลดเสร็จ
+    })
+    .catch((error) => {
+        console.error('Failed to load component:', error);
+    });
+
+// ใช้งานกับ async/await
+(async () => {
+    try {
+        await loadComponent('navbar', 'navbar.html');
+        await loadComponent('footer', 'footer.html');
+        console.log('All components loaded!');
+    } catch (error) {
+        console.error('Error loading components:', error);
+    }
+})();
+```
+
+**โครงสร้างไฟล์:**
+```
+public/
+├── assets/
+│   └── components/
+│       ├── navbar.html
+│       └── footer.html
+└── index.html
+```
+
+**หมายเหตุ:** ต้องมี element ใน HTML ที่มี id ตรงกับ parameter แรกของฟังก์ชัน เช่น `<div id="navbar"></div>`
+
 ---
 
 ## 📌 Prerequisites
@@ -81,8 +127,11 @@ NODE_ENV=localhost
 node1/
 ├── public/              # ไฟล์ static (HTML, CSS, JS)
 │   ├── assets/
+│   │   ├── components/  # HTML components
+│   │   │   ├── navbar.html
+│   │   │   └── footer.html
 │   │   └── js/
-│   │       └── script.js    # loadCDN function
+│   │       └── script.js    # loadCDN และ loadComponent functions
 │   └── index.html
 ├── index.js             # Entry point ของแอปพลิเคชัน
 ├── package.json          # Dependencies และ scripts
@@ -148,6 +197,38 @@ loadCDN('js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bu
 ```
 
 > 💡 **เคล็ดลับ**: ฟังก์ชันจะตรวจสอบว่า resource ถูกโหลดไปแล้วหรือยัง หากโหลดแล้วจะไม่โหลดซ้ำ
+
+### ใช้ loadComponent Function
+
+ฟังก์ชัน `loadComponent()` ถูกโหลดอัตโนมัติเมื่อหน้าเว็บโหลด (ผ่าน `script.js`) สามารถเรียกใช้งานได้ทันที:
+
+```javascript
+// โหลด navbar component
+loadComponent('navbar', 'navbar.html')
+    .then(() => {
+        console.log('Navbar loaded!');
+        // ทำงานต่อหลังจากโหลดเสร็จ เช่น จัดการ UI ตาม token
+    })
+    .catch((error) => {
+        console.error('Failed to load navbar:', error);
+    });
+
+// โหลด footer component
+loadComponent('footer', 'footer.html');
+
+// ใช้ async/await
+(async () => {
+    try {
+        await loadComponent('navbar', 'navbar.html');
+        await loadComponent('footer', 'footer.html');
+        console.log('All components loaded!');
+    } catch (error) {
+        console.error('Error loading components:', error);
+    }
+})();
+```
+
+> 💡 **เคล็ดลับ**: ใช้ `.then()` เพื่อทำงานต่อหลังจาก component โหลดเสร็จ เช่น การจัดการ UI elements ที่อยู่ใน component นั้น
 
 ---
 

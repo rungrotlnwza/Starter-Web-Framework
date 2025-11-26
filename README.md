@@ -75,6 +75,85 @@ loadComponent('navbar', 'navbar.html')
     }
 })();
 ```
+### 6. Cookie Utility Functions
+
+โปรเจกต์นี้มาพร้อมกับฟังก์ชันสำหรับจัดการ Cookie ที่ใช้งานง่าย ช่วยให้สามารถเก็บข้อมูลใน browser ได้อย่างสะดวก เช่น การเก็บ authentication token, การตั้งค่าของผู้ใช้, หรือ session data
+
+**คุณสมบัติ:**
+- บันทึก cookie พร้อมกำหนดวันหมดอายุ
+- อ่านค่า cookie ได้ง่าย
+- ลบ cookie ได้ทันที
+- รองรับการใช้งานกับ authentication และ user preferences
+
+**ฟังก์ชันที่พร้อมใช้งาน:**
+
+#### `setCookie(name, value, days)`
+บันทึก cookie พร้อมกำหนดวันหมดอายุ
+
+**พารามิเตอร์:**
+- `name` (string): ชื่อของ cookie
+- `value` (string): ค่าที่ต้องการเก็บ
+- `days` (number): จำนวนวันที่ cookie จะหมดอายุ
+
+#### `getCookie(name)`
+อ่านค่าจาก cookie
+
+**พารามิเตอร์:**
+- `name` (string): ชื่อของ cookie ที่ต้องการอ่าน
+
+**ค่าที่ส่งกลับ:** ค่าใน cookie (string) หรือ `null` ถ้าไม่พบ cookie
+
+#### `deleteCookie(name)`
+ลบ cookie ออกจาก browser
+
+**พารามิเตอร์:**
+- `name` (string): ชื่อของ cookie ที่ต้องการลบ
+
+**ตัวอย่างการใช้งาน:**
+
+```javascript
+// บันทึก authentication token ไว้ 7 วัน
+setCookie('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...', 7);
+
+// บันทึกการตั้งค่าภาษาไว้ 30 วัน
+setCookie('language', 'th', 30);
+
+// บันทึก theme preference ไว้ 365 วัน
+setCookie('theme', 'dark', 365);
+
+// อ่านค่า token
+const token = getCookie('token');
+if (token) {
+    console.log('User is authenticated');
+    // แสดง UI สำหรับผู้ที่ login แล้ว
+}
+
+// อ่านค่าภาษา
+const language = getCookie('language') || 'en'; // ใช้ค่า default ถ้าไม่มี
+
+// ลบ token เมื่อ logout
+deleteCookie('token');
+
+// ใช้งานร่วมกับ authentication check
+loadComponent('navbar', 'navbar.html').then(() => {
+    const token = getCookie('token');
+    if (token) {
+        // แสดงเมนูสำหรับผู้ที่ login แล้ว
+        document.getElementById('dashboard').classList.remove('d-none');
+        document.getElementById('logout').classList.remove('d-none');
+    } else {
+        // แสดงเมนูสำหรับผู้ที่ยังไม่ได้ login
+        document.getElementById('login').classList.remove('d-none');
+        document.getElementById('register').classList.remove('d-none');
+    }
+});
+```
+
+**ประโยชน์ของ Cookie:**
+- เก็บข้อมูลที่ต้องส่งไปยัง server อัตโนมัติ (เช่น JWT token)
+- จำการตั้งค่าของผู้ใช้ข้าม session
+- ทำงานได้ดีกับ server-side rendering และ API calls
+- เหมาะสำหรับการจัดการ authentication และ authorization
 
 **โครงสร้างไฟล์:**
 ```
@@ -86,7 +165,7 @@ public/
 └── index.html
 ```
 
-**หมายเหตุ:** ต้องมี element ใน HTML ที่มี id ตรงกับ parameter แรกของฟังก์ชัน เช่น `<div id="navbar"></div>`
+**หมายเหตุ:** ต้องมี element ใน HTML ที่มี id ตรงกับ parameter แรกของฟังก์ชัน `loadComponent()` เช่น `<div id="navbar"></div>`
 
 ---
 
